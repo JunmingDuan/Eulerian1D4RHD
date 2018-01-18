@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief test cpp for 1D Lagranian scheme for RHD
+ * @brief test cpp for 1D RHD
  * @author Duan Junming, duanjm@pku.edu.cn
  * @version 1.0
  * @date 2018-01-15
@@ -80,11 +80,10 @@ int main(int argc, char* argv[])
 
   SCL1D<bU> Q(Nx, t_start, t_end, x_start, x_end, initial, CFL);
   std::cout << "Initialization completed ..." << std::endl;
-  clock_t t1, t2;
-  t1 = clock();
+  double t1 = omp_get_wtime();
   std::cout << "Start to solve ..." << std::endl;
   Q.Solve();
-  t2 = clock();
+  double t2 = omp_get_wtime();
 
   std::ofstream outfile("sol.dat",std::ios::out);
   if(!outfile) {
@@ -94,7 +93,7 @@ int main(int argc, char* argv[])
   Q.print_rupe(outfile);
   outfile.close();
 
-  std::cout << "Time consumed: " << (double)(t2-t1)/CLOCKS_PER_SEC << std::endl;
+  std::cout << "Time consumed: " << (t2-t1)<< std::endl;
 
   return 0;
 }

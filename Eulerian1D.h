@@ -11,7 +11,9 @@
 #include <iostream>
 #include <assert.h>
 #include <cstdlib>
+#include <omp.h>
 #include "vvector.h"
+#include "para.h"
 
 typedef mvector<double,3> bU; //(D, m, E), cell average
 
@@ -37,7 +39,7 @@ bU Con2Pri(const bU& U, const double Gamma) {
   bU prim;
   //solve a nonlinear equation by Newton method to obtain pressure p
   u_int ite(0), MAXITE(20);
-  double eps = 1e-13;
+  double eps = 1e-15;
   double p(0), p1(p), y(fp(U,p, Gamma));
   while(fabs(y) > eps && ite < MAXITE) {
     p1 = p - y/fpp(U, p, Gamma);
@@ -46,7 +48,6 @@ bU Con2Pri(const bU& U, const double Gamma) {
     if(fabs(p1-p) < eps) { p = p1; break; }
     p = p1;
   }
-  //std::cout << ite << " " << y << std::endl;
   prim[2] = p;
   prim[1] = U[1]/(U[2]+p);
   prim[0] = U[0]*sqrt(1-pow(prim[1],2));
@@ -107,6 +108,7 @@ class SCL1D {
         us.assign(N_x+1, 0);
         FLUX.resize(N_x+1);
         double h = (x_end - x_start) / N_x;
+#pragma omp parallel for num_threads(Nthread)
         for(u_int i = 0; i < N_x+1; ++i) {
           mesh[i] = h*i;
         }
@@ -114,11 +116,10 @@ class SCL1D {
 
   private:
     void Initial() {
-      for(u_int j = 0; j != N_x; ++j) {
+#pragma omp parallel for num_threads(Nthread)
+      for(u_int j = 0; j < N_x; ++j) {
         Pri[j] = initial(t_start, 0.5*(mesh[j]+mesh[j+1]), Gamma[j]);
         Con[j] = Pri2Con(Pri[j], Gamma[j]);
-        //mi[j] = NumSol[j][0] * 0.5*(pow(mesh[j+1], 2) - pow(mesh[j], 2));
-        //A[j] = mesh[j+1] - mesh[j];
       }
     }
 
@@ -144,63 +145,17 @@ class SCL1D {
     double t_step(const double CFL, double& alpha) {
       double a(1e-2), tmp_lam, hi, tmp_t;
       alpha = 0;
-      for(u_int i = 0; i < N_x; ++i) {
-        hi = mesh[i+1] - mesh[i];
-        tmp_lam = cal_speed(i);
-        if(tmp_lam > alpha) alpha = tmp_lam;
-        tmp_t = hi/tmp_lam;
-        if(tmp_t < a) a = tmp_t;
+      {
+        for(u_int i = 0; i < N_x; ++i) {
+          hi = mesh[i+1] - mesh[i];
+          tmp_lam = cal_speed(i);
+          tmp_t = hi/tmp_lam;
+          alpha = std::max(alpha, tmp_lam);
+          a = std::min(a, tmp_t);
+        }
       }
       return CFL*a;
-      //double dt2(eps);
-      //for(u_int i = 0; i < N_x; ++i) {
-        //double tmp = 0.4*(mesh[i+1]-mesh[i])/std::max(fabs(us[i]), fabs(us[i+1]));
-        //if(tmp < dt2) dt2 = tmp;
-      //}
-      //double sigma(1);
-      //for(u_int i = 0; i < N_x; ++i) {
-        //double ei = NumSol[i][2] - 0.5*pow(NumSol[i][1],2);
-        //double tmp = std::min(1.0, 0.5*NumSol[i][0]*ei/EOS(NumSol[i], gamma[i]));
-        //if(tmp < sigma) sigma = tmp;
-      //}
-      //double dt3(eps);
-      //for(u_int i = 0; i < N_x; ++i) {
-        //double tmp = sigma*mi[i]/NumSol[i][0]/fabs(mesh[i+1]*us[i+1]-mesh[i]*us[i]);
-        //if(tmp < dt3) dt3 = tmp;
-      //}
-      //double dt4(eps);
-      //for(u_int i = 0; i < N_x; ++i) {
-        //double z = NumSol[i][0]*sqrt(gamma[i]*EOS(NumSol[i], gamma[i])/NumSol[i][0]);
-        //double tmp = mi[i]/(mesh[i+1]*z+mesh[i]*z);
-        //if(tmp < dt4) dt4 = tmp;
-      //}
-      //double dt5(1);
-      //for(u_int i = 0; i < N_x; ++i) {
-        //double pi = EOS(NumSol[i], gamma[i]);
-        //double mu = (mesh[i+1] - mesh[i])*(pi -
-        //double z = Numsol[i][0]*sqrt(gamma[i]/NumSol[i][0]);
-        //double tmp = mi[i]/(mesh[i+1]*z+mesh[i]*z);
-        //if(tmp < dt4) dt4 = tmp;
-      //}
-      //std::cout << "dt1: " << dt1 << "; dt2: " << dt2 << "; sigma: " << sigma << "; dt3: " << dt3 << "; dt4: " << dt4 << std::endl;
-      //return std::min(dt1, dt2);
     }
-
-    //void rp_solver(const bU& UL, const bU& UR, double& us, double& ps, const double gammal, const double gammar) {
-      //double pl = EOS(UL, gammal);
-      //double pr = EOS(UR, gammar);
-      //double ul = UL[1];
-      //double ur = UR[1];
-      //double al = sqrt(gammal*pl/UL[0]);
-      //double ar = sqrt(gammar*pr/UR[0]);
-      //if(al != al) std::cout << "al wrong: " << pl << " " << UL[0] << std::endl;
-      //if(ar != ar) std::cout << "ar wrong: " << pr << " " << UR[0] << std::endl;
-      //double zl = UL[0] * al;
-      //double zr = UR[0] * ar;
-      //double sum = zl + zr;
-      //us = (zl*ul + zr*ur)/sum - (pr-pl)/sum;
-      //ps = (zl*pr + zr*pl)/sum - zl*zr*(ur-ul)/sum;
-    //}
 
     bU F(const bU& CON, const bU& PRI) {
       bU tmp;
@@ -215,6 +170,7 @@ class SCL1D {
     }
 
     void cal_flux(double alpha) {
+#pragma omp parallel for num_threads(Nthread)
       for(u_int i = 0; i < N_x+1; ++i) {
         if(i == 0) FLUX[i] = LF(ghostl.Con, Con[i], ghostl.Pri, Pri[i], alpha);
         else if(i == N_x) FLUX[i] = LF(Con[i-1], ghostr.Con, Pri[i-1], ghostr.Pri, alpha);
@@ -222,56 +178,17 @@ class SCL1D {
       }
     }
 
-/*    void cal_flux() {*/
-      //vvector<double> ps(N_x+1);
-      //for(u_int i = 1; i < N_x; ++i) {
-        //rp_solver(NumSol[i-1], NumSol[i], us[i], ps[i], gamma[i-1], gamma[i]);
-      //}
-      ////r=0不动
-      //rp_solver(ghostl.u, NumSol[0], us[0], ps[0], ghostl.gamma, gamma[0]);
-      //rp_solver(NumSol[N_x-1], ghostr.u, us[N_x], ps[N_x], gamma[N_x-1], ghostr.gamma);
-      //for(u_int i = 0; i < N_x; ++i) {
-        ////if(i != N_x-1) {
-          //flux[i][0] = 0;
-          //flux[i][1] = -(mesh[i+1]*ps[i+1] - mesh[i]*ps[i])/mi[i];
-          //flux[i][2] = -(mesh[i+1]*ps[i+1]*us[i+1] - mesh[i]*ps[i]*us[i])/mi[i];
-        ////}
-        ////else {
-          ////flux[i][0] = 0;
-          ////flux[i][1] = -(- mesh[i]*ps[i])/mi[i] + (mesh[i+1]-mesh[i])*EOS(NumSol[i],gamma[i])/mi[i];
-          ////flux[i][2] = -(- mesh[i]*ps[i]*us[i])/mi[i];
-        ////}
-      //}
-    //}
-
-    //void move_mesh(double dt) {
-      //mesh += dt * us;
-      //for(u_int i = 0; i < N_x; ++i) {
-        //A[i] = (mesh[i+1]-mesh[i]);
-        //if(A[i] < 0) {
-          //std::cout << "mesh wrong! " << mesh[i] << " " << mesh[i+1] << std::endl;
-          //abort();
-        //}
-      //}
-    //}
-
-    //void modify_rho() {
-      //for(u_int i = 0; i < N_x; ++i) {
-        //NumSol[i][0] = mi[i]/( 0.5*(pow(mesh[i+1], 2) - pow(mesh[i], 2)) );
-      //}
-    //}
-
     void forward(double dt, double alpha) {
       InfiniteBD();
       cal_flux(alpha);
-      //move_mesh(dt);
+#pragma omp parallel for num_threads(Nthread)
       for(u_int i = 0; i < N_x; ++i) {
         Con[i] += -dt/(mesh[i+1]-mesh[i])*(FLUX[i+1] - FLUX[i]);
       }
+#pragma omp parallel for num_threads(Nthread)
       for(u_int i = 0; i < N_x; ++i) {
         Pri[i] = Con2Pri(Con[i], Gamma[i]);
       }
-      //modify_rho();
     }
 
   public:
@@ -279,27 +196,15 @@ class SCL1D {
       double t_now(t_start), dt(0), alpha(0);
 			Initial();
 
-      //std::cout << "conservative" << std::endl;
-      //print_con(std::cout);
-      //std::cout << "primitive" << std::endl;
-      //print_pri(std::cout);
-      //for(u_int i=0; i < N_x; i++) {
-        //std::cout << 0.5*(mesh[i]+mesh[i+1]) << " " << Con2Pri(Con[i], Gamma[i]) << "\n";
-      //}
-
-      while(t_now < t_end - 1e-10) {
-        //if(t_now < 2.6e-2) dt = t_step(1e-6);
-        //else dt = t_step(CFL);
+      while(t_now < t_end) {
         dt = t_step(CFL, alpha);
-        if(dt + t_now > t_end) dt = t_end - t_now;
+        dt = std::min(dt, t_end - t_now);
 
         forward(dt, alpha);
 
         t_now += dt;
         std::cout << "t: " << t_now << " , dt: " << dt << std::endl;
       }
-      //std::cout << mi << std::endl;
-      //std::cout << mesh << std::endl;
 		}
 
 		template<class Type> friend std::ostream& operator<<(std::ostream&,SCL1D<Type>&);
