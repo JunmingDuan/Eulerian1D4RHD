@@ -14,42 +14,52 @@
 #include <fstream>
 #include "vvector.h"
 #include "mvector.h"
-#include "Lag1D.h.h"
+#include "Eulerian1D.h"
 
-bU initial(const double t, const double x, double& gamma) {
+bU initial(const double t, const double x, double& Gamma) {
   bU v;
-  //if(x < 0.1) {
-    //double rhol = 1;
-    //double ul = 1;
-    //double pl = 1e3;
-    //gamma = 1.4;
-    //v[0] = rhol;
-    //v[1] = ul;
-    //v[2] = pl/(gamma-1.0) + 0.5*ul*ul*rhol;
-  //}
-  //else if(x < 0.9) {
-    //double rhom = 1;
-    //double um = 1;
-    //double pm = 1e-2;
-    //gamma = 1.4;
-    //v[0] = rhom;
-    //v[1] = um;
-    //v[2] = pm/(gamma-1.0) + 0.5*um*um*rhom;
+  //if(x < 0.5) {
+    //v[0] = 10;
+    //v[1] = 0;
+    //v[2] = 40./3;
+    //Gamma = 5./3;
   //}
   //else {
-    //double rhor = 1;
-    //double ur = 1;
-    //double pr = 1e2;
-    //gamma = 1.4;
-    //v[0] = rhor;
-    //v[1] = ur;
-    //v[2] = pr/(gamma-1.0) + 0.5*ur*ur*rhor;
+    //v[0] = 1;
+    //v[1] = 0;
+    //v[2] = 1e-6;
+    //Gamma = 5./3;
   //}
-  double p = 1e-13;
-  gamma = 5./3;
-  v[0] = 1;
-  v[1] = -1;
-  v[2] = p/(gamma-1.0)+0.5;
+  //if(x < 0.5) {
+    //v[0] = 1;
+    //v[1] = -0.5;
+    //v[2] = 2;
+    //Gamma = 5./3;
+  //}
+  //else {
+    //v[0] = 1;
+    //v[1] = 0.5;
+    //v[2] = 2;
+    //Gamma = 5./3;
+  //}
+  if(x < 0.1) {
+    v[0] = 1;
+    v[1] = 0;
+    v[2] = 1e3;
+    Gamma = 1.4;
+  }
+  else if(x < 0.9){
+    v[0] = 1;
+    v[1] = 0;
+    v[2] = 1e-2;
+    Gamma = 1.4;
+  }
+  else {
+    v[0] = 1;
+    v[1] = 0;
+    v[2] = 1e2;
+    Gamma = 1.4;
+  }
 
   return v;
 }
@@ -68,10 +78,11 @@ int main(int argc, char* argv[])
   u_int Nx = atoi(argv[1]);
   double CFL = atof(argv[2]);
 
-  SCL1D<bU> Q(Nx, t_start, t_end, x_start, x_end,
-      initial, CFL);
+  SCL1D<bU> Q(Nx, t_start, t_end, x_start, x_end, initial, CFL);
+  std::cout << "Initialization completed ..." << std::endl;
   clock_t t1, t2;
   t1 = clock();
+  std::cout << "Start to solve ..." << std::endl;
   Q.Solve();
   t2 = clock();
 
@@ -79,9 +90,11 @@ int main(int argc, char* argv[])
   if(!outfile) {
     std::cout << "Open file failed!" << std::endl;
   }
+  std::cout << "Print solution to " << "sol.dat" << " ..." << std::endl;
+  Q.print_rupe(outfile);
+  outfile.close();
 
-  outfile << Q << std::endl;
-  std::cout << "time: " << (double)(t2-t1)/CLOCKS_PER_SEC << std::endl;
+  std::cout << "Time consumed: " << (double)(t2-t1)/CLOCKS_PER_SEC << std::endl;
 
   return 0;
 }

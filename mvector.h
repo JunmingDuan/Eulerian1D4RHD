@@ -143,7 +143,6 @@ std::istream& operator>>(std::istream& in, mvector<T,Size>& mv){
 
 template<class T,int Size> 
 std::ostream& operator<<(std::ostream& os, const mvector<T,Size>& mv){
-  os.precision(16);
 	//os<<std::showpos;
 	//os<<std::fixed;
 	//os.setf(std::ios::scientific);
