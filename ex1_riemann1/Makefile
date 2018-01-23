@@ -14,8 +14,8 @@
 EXECUTABLE := main    # 可执行文件名
 LIBDIR:=              # 静态库目录
 LIBS :=               # 静态库文件名
-INCLUDES:=.           # 头文件目录
-SRCDIR:=              # 除了当前目录外，其他的源代码文件目录
+INCLUDES:=. ../include          # 头文件目录
+SRCDIR:= ../src             # 除了当前目录外，其他的源代码文件目录
 #
 # # Now alter any implicit rules' variables if you like, e.g.:
 
@@ -33,7 +33,6 @@ CPPFLAGS += -MMD
 #
 
 RM-F := rm -f
-
 
 # # You shouldn't need to change anything below this point.
 #
@@ -53,9 +52,9 @@ deps : $(DEPS)
 objs : $(OBJS)
 
 clean :
-	@$(RM-F) *.o
-	@$(RM-F) *.d
-veryclean: clean 
+	@$(RM-F) $(addsuffix /*.o, $(SRCDIR))
+	@$(RM-F) $(addsuffix /*.d, $(SRCDIR))
+veryclean: clean
 	@$(RM-F) $(EXECUTABLE)
 
 rebuild: veryclean all

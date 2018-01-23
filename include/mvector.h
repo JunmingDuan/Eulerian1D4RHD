@@ -143,9 +143,6 @@ std::istream& operator>>(std::istream& in, mvector<T,Size>& mv){
 
 template<class T,int Size> 
 std::ostream& operator<<(std::ostream& os, const mvector<T,Size>& mv){
-	//os<<std::showpos;
-	//os<<std::fixed;
-	//os.setf(std::ios::scientific);
 	for(int i=0;i!=mv.size;++i){
 		os<<mv[i]<<"\t";
 	}
