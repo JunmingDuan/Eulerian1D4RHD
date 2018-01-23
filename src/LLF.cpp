@@ -22,6 +22,7 @@ void Eulerian1D::cal_flux_LLF(Sol& ReconL_Con, Sol& ReconR_Con, Sol& ReconL_Pri,
       lamr = cal_max_lambda_Eul(ReconR_Con[i], ReconR_Pri[i], Gamma[i]);
     }
     alpha = std::max(laml, lamr);
+    //alpha *= 1.3;
     FLUX[i] = LLF(ReconL_Con[i], ReconR_Con[i], ReconL_Pri[i], ReconR_Pri[i], alpha);
   }
 }

@@ -19,16 +19,24 @@
 bU initial(const double t, const double x, double& Gamma) {
   bU v;
   if(x < 0.5) {
-    v[0] = 10;
-    v[1] = 0;
-    v[2] = 40./3;
-    Gamma = 5./3;
+    //v[0] = 10;
+    //v[1] = 0;
+    //v[2] = 40./3;
+    //Gamma = 5./3;
+    v[0] = 1;
+    v[1] = 0.9;
+    v[2] = 1;
+    Gamma = 4./3;
   }
   else {
+    //v[0] = 1;
+    //v[1] = 0;
+    //v[2] = 1e-6;
+    //Gamma = 5./3;
     v[0] = 1;
     v[1] = 0;
-    v[2] = 1e-6;
-    Gamma = 5./3;
+    v[2] = 10;
+    Gamma = 4./3;
   }
 
   return v;

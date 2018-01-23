@@ -25,12 +25,19 @@ class GHOST {
     double Gamma;
 };
 
+struct Con_params
+{
+  double D, m, E, Gamma;
+};
+
+
 class Eulerian1D {
   private:
     typedef bU (*Lfun)(const double t, const double x, double& gamma);
     typedef bU (*NLfun)(bU u, double t, double x);
     typedef vvector<bU> Sol;
     typedef vvector<double> VEC;
+
     u_int N_x;
     double t_start;
     double t_end;
@@ -45,7 +52,6 @@ class Eulerian1D {
     VEC Di;
     VEC mesh;
     VEC Gamma;
-    VEC us;
     VEC cs;
     Sol FLUX;
     GHOST ghostl, ghostr;
@@ -64,7 +70,6 @@ class Eulerian1D {
         Di.resize(N_x);
         mesh.assign(N_x+1, 0);
         Gamma.assign(N_x, 0);
-        us.assign(N_x+1, 0);
         cs.assign(N_x, 0);
         FLUX.resize(N_x+1);
         double h0 = (x_end - x_start) / N_x;
@@ -91,8 +96,11 @@ class Eulerian1D {
       ghostr.Gamma = Gamma[N_x-1];
     }
 
-    double fp(const bU& U, double p, const double Gamma);
-    double fpp(const bU& U, double p, const double Gamma);
+    //double fp(const bU& U, double p, const double Gamma);
+    //double fpp(const bU& U, double p, const double Gamma);
+    double fp(double x, void *params);
+    double fpp(double x, void *params);
+    void fp_fdf(double x, void *params, double *y, double *dy);
     /**
      * @brief Con2Pri solve (rho,u,p) from (D, m, E)
      *
@@ -121,11 +129,13 @@ class Eulerian1D {
     bU LLF(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PRIR, const double alpha);
     void cal_flux_LLF(Sol& ReconL_Con, Sol& ReconR_Con, Sol& ReconL_Pri, Sol& ReconR_Pri, Sol& FLUX);
 
-    bU HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PRIR, const double Gammal, const double Gammar, double&);
-    void cal_flux_HLLC(Sol& ReconL_Con, Sol& ReconR_Con, Sol& ReconL_Pri, Sol& ReconR_Pri,
-        Sol& FLUX, VEC& us);
+    bU HLL(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PRIR, const double Gammal, const double Gammar);
+    void cal_flux_HLL(Sol& ReconL_Con, Sol& ReconR_Con, Sol& ReconL_Pri, Sol& ReconR_Pri, Sol& FLUX);
 
-    void cal_us_roeav(Sol& ReconL_Pri, Sol& ReconR_Pri, VEC& us);
+    bU HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PRIR, const double Gammal, const double Gammar);
+    void cal_flux_HLLC(Sol& ReconL_Con, Sol& ReconR_Con, Sol& ReconL_Pri, Sol& ReconR_Pri,
+        Sol& FLUX);
+
     void move_mesh(VEC&, VEC&, double dt, VEC&);
 
     void Reconstruction(const Sol&, const VEC&,//待重构变量
@@ -133,6 +143,7 @@ class Eulerian1D {
 
     void Euler_forward_LF(double dt, double alpha, VEC& mesh);
     void Euler_forward_LLF(double dt, VEC& mesh);
+    void Euler_forward_HLL(const double dt, VEC& mesh);
     void Euler_forward_HLLC(const double dt, VEC& mesh);
 
     void RK2_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt);

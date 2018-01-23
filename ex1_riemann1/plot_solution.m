@@ -6,7 +6,8 @@ u1 = DAT1(:,3);
 p1 = DAT1(:,4);
 e1 = DAT1(:,5);
 
-DAT2 = load('ex1_LF_n1000.dat');
+%DAT2 = load('ex1_LLF_n400_Eul.dat');
+DAT2 = load('HLL.dat');
 x2 = DAT2(:,1);
 rho2 = DAT2(:,2);
 u2 = DAT2(:,3);

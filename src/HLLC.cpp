@@ -1,7 +1,7 @@
 #include "Eulerian1D.h"
 
-bU Eulerian1D::HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PRIR, const double Gammal, const double Gammar, double& SM) {
-  double SL, SR;//, ui, ci, vl, vr;
+bU Eulerian1D::HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PRIR, const double Gammal, const double Gammar) {
+  double SM, SL, SR;//, ui, ci, vl, vr;
   double hl, csl, ul, hr, csr, ur;
   double lam1, lam2, lam3, lam4;
 
@@ -31,38 +31,40 @@ bU Eulerian1D::HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PR
     else SM = (coe2 - sqrt(coe2*coe2 - 4.*coe1*coe3))/2./coe1;
     PM = (SM*(SL*CONL[2]-CONL[1]) + PRIL[2] - CONL[1]*(SL-PRIL[1])) / (1-SL*SM);
     if(SM >= 0) {
-      bU U, F;
+      bU U, FS;
       U[0] = CONL[0]*(SL-PRIL[1])/(SL-SM);
       U[1] = (CONL[1]*(SL-PRIL[1])+PM-PRIL[2])/(SL-SM);
       U[2] = (CONL[2]*(SL-PRIL[1])+PM*SM-PRIL[2]*PRIL[1])/(SL-SM);
-      F[0] = U[0]*SM;
-      F[1] = U[1]*SM + PM;
-      F[2] = U[2]*SM + PM*SM;
-      return F;
+      //F[0] = U[0]*SM;
+      //F[1] = U[1]*SM + PM;
+      //F[2] = U[2]*SM + PM*SM;
+      FS = F(CONL, PRIL) + SL*(U - CONL);
+      return FS;
     }
     else {
-      bU U, F;
+      bU U, FS;
       U[0] = CONR[0]*(SR-PRIR[1])/(SR-SM);
       U[1] = (CONR[1]*(SR-PRIR[1])+PM-PRIR[2])/(SR-SM);
       U[2] = (CONR[2]*(SR-PRIR[1])+PM*SM-PRIR[2]*PRIR[1])/(SR-SM);
-      F[0] = U[0]*SM;
-      F[1] = U[1]*SM + PM;
-      F[2] = U[2]*SM + PM*SM;
-      return F;
+      //F[0] = U[0]*SM;
+      //F[1] = U[1]*SM + PM;
+      //F[2] = U[2]*SM + PM*SM;
+      FS = F(CONR, PRIR) + SR*(U - CONR);
+      return FS;
     }
   }
 }
 
 void Eulerian1D::cal_flux_HLLC(Sol& ReconL_Con, Sol& ReconR_Con, Sol& ReconL_Pri, Sol& ReconR_Pri,
-    Sol& FLUX, vvector<double>& us) {
+    Sol& FLUX) {
 #pragma omp parallel for num_threads(Nthread)
   for(u_int i = 0; i < N_x+1; ++i) {
     if(i == 0) FLUX[i] = HLLC(ReconL_Con[i], ReconR_Con[i], ReconL_Pri[i], ReconR_Pri[i],
-        Gamma[0], Gamma[i], us[i]);
+        Gamma[0], Gamma[i]);
     else if(i == N_x) FLUX[i] = HLLC(ReconL_Con[i], ReconR_Con[i], ReconL_Pri[i], ReconR_Pri[i],
-        Gamma[i-1], Gamma[N_x-1], us[i]);
+        Gamma[i-1], Gamma[N_x-1]);
     else FLUX[i] = HLLC(ReconL_Con[i], ReconR_Con[i], ReconL_Pri[i], ReconR_Pri[i],
-        Gamma[i-1], Gamma[i], us[i]);
+        Gamma[i-1], Gamma[i]);
   }
 }
 

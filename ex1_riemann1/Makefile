@@ -20,7 +20,7 @@ SRCDIR:= ../src             # 除了当前目录外，其他的源代码文件�
 # # Now alter any implicit rules' variables if you like, e.g.:
 
 CC:=g++
-CFLAGS := -g -Wall -O3 -fopenmp -std=c++11
+CFLAGS := -g -Wall -O3 -fopenmp -std=c++11 -lgsl -lgslcblas
 CPPFLAGS := $(CFLAGS)
 CPPFLAGS += $(addprefix -I,$(INCLUDES))
 CPPFLAGS += -MMD
@@ -52,8 +52,8 @@ deps : $(DEPS)
 objs : $(OBJS)
 
 clean :
-	@$(RM-F) $(addsuffix /*.o, $(SRCDIR))
-	@$(RM-F) $(addsuffix /*.d, $(SRCDIR))
+	@$(RM-F) $(addsuffix /*.o, $(SRCDIR)) *.o
+	@$(RM-F) $(addsuffix /*.d, $(SRCDIR)) *.d
 veryclean: clean
 	@$(RM-F) $(EXECUTABLE)
 
