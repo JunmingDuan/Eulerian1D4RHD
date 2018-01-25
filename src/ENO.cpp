@@ -75,11 +75,12 @@ void ENO2(double h1, double h2, double h3, const double u1, const double u2, con
   double k2 = 2.*(u3 - u2)/(h2 + h3);
   //minmod limiter
   double krho;
-  if(fabs(k1) > fabs(k2)) { krho = k2; }
-  else { krho = k1; }
+  //if(k1*k2 < 0) krho = 0;
+  //else krho = fabs(k1)>fabs(k2) ? k2 : k1;
+  krho = fabs(k1)>fabs(k2) ? k2 : k1;
 
-  ul = krho*(h2/2.) + u2;
-  ur = -krho*(h2/2.) + u2;
+  ul = -krho*(h2/2.) + u2;
+  ur = krho*(h2/2.) + u2;
 }
 
 

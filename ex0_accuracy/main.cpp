@@ -3,7 +3,7 @@
  * @brief test cpp for 1D Lagranian scheme for RHD
  * @author Duan Junming, duanjm@pku.edu.cn
  * @version 1.0
- * @date 2018-01-15
+ * @date 2018-01-25
  */
 #include <iostream>
 #include <cstdlib>
@@ -16,28 +16,13 @@
 #include "mvector.h"
 #include "Eulerian1D.h"
 
+//primitive variables
 bU initial(const double t, const double x, double& Gamma) {
   bU v;
-  if(x < 0.5) {
-    v[0] = 10;
-    v[1] = 0;
-    v[2] = 40./3;
-    Gamma = 5./3;
-    //v[0] = 1;
-    //v[1] = 0.9;
-    //v[2] = 1;
-    //Gamma = 4./3;
-  }
-  else {
-    v[0] = 1;
-    v[1] = 0;
-    v[2] = 1e-6;
-    Gamma = 5./3;
-    //v[0] = 1;
-    //v[1] = 0;
-    //v[2] = 10;
-    //Gamma = 4./3;
-  }
+  v[0] = 1+0.2*sin(2*M_PI*(x-0.99*t));
+  v[1] = 0.99;
+  v[2] = 1;
+  Gamma = 4./3;
 
   return v;
 }

@@ -35,60 +35,6 @@ void Eulerian1D::print_rupe(std::ostream& os) {
   }
 }
 
-//double Eulerian1D::fp(const bU& U, double p, const double Gamma) {
-  //double gamma2 = 1 - pow(U[1]/(p+U[2]),2);
-  //return U[2]+p - U[0]/sqrt(gamma2) - Gamma/(Gamma-1)*p/gamma2;
-//}
-
-/*double Eulerian1D::fpp(const bU& U, double p, const double Gamma) {*/
-  //double Ep = U[2] + p;
-  //double tmp = pow(U[1]/Ep, 2);
-  //double gamma2 = 1 - tmp;
-  //return 1 + U[0]*tmp/Ep/pow(gamma2, 1.5) - Gamma/(Gamma-1)*(gamma2 - 2*p*tmp/Ep)/pow(gamma2,2);
-//}
-
-//[>bU Eulerian1D::Con2Pri(const bU& U, const double Gamma) {<]
-  ////bU prim;
-  //////solve a nonlinear equation by Newton method to obtain pressure p
-  ////u_int ite(0), MAXITE(10);
-  ////double eps = 1e-15;
-  ////double a = 0, b = (Gamma-1)*U[2];
-  ////double p(0), p1(p), y(fp(U,p, Gamma));
-  ////while(fabs(y) > eps && ite < MAXITE) {
-    ////p1 = p - y/fpp(U, p, Gamma);
-    ////y = fp(U, p1, Gamma);
-    ////ite++;
-    ////if(fabs(p1-p) < eps) { p = p1; break; }
-    ////p = p1;
-  ////}
-  ////prim[2] = p;
-  ////prim[1] = U[1]/(U[2]+p);
-  ////prim[0] = U[0]*sqrt(1-pow(prim[1],2));
-
-  ////return prim;
-////}
-
-//bU Eulerian1D::Con2Pri(const bU& U, const double Gamma) {
-  //bU prim;
-  ////solve a nonlinear equation by Newton method to obtain pressure p
-  //u_int ite(0), MAXITE(20);
-  //double eps = 1e-15;
-  //double a = 0, b = (Gamma-1)*U[2];
-  //double p(0.5*b), p1(p), y(fp(U,p, Gamma));
-  //while(fabs(y) > eps && ite < MAXITE) {
-    //p1 = p - y/fpp(U, p, Gamma);
-    //y = fp(U, p1, Gamma);
-    //ite++;
-    //if(fabs(p1-p) < eps) { p = p1; break; }
-    //p = p1;
-  //}
-  //prim[2] = p;
-  //prim[1] = U[1]/(U[2]+p);
-  //prim[0] = U[0]*sqrt(1-pow(prim[1],2));
-
-  //return prim;
-/*}*/
-
 bU Eulerian1D::Pri2Con(const bU& U, const double Gamma) {
   bU Con;
   double gamma = 1./sqrt(1-U[1]*U[1]);

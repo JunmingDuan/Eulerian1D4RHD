@@ -18,6 +18,14 @@ bU Eulerian1D::HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PR
   lam4 = ur+(1-ur*ur)*csr/(1+ur*csr);//positive speed
   SL = std::min((lam1), (lam3));//left characteristic speed
   SR = std::max((lam2), (lam4));//right characteristic speed
+
+  if(SL > 0) {
+    return F(CONL, PRIL);
+  }
+  else if(SR < 0) {
+    return F(CONR, PRIR);
+  }
+  else
   {
     //cal S^* and p^*, S^* is the smaller root of a quadric equation:
     //F_E^{hll} x^2 - (E^{hll}+F^{hll}_m) x + m^{hll} = 0
@@ -35,10 +43,10 @@ bU Eulerian1D::HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PR
       U[0] = CONL[0]*(SL-PRIL[1])/(SL-SM);
       U[1] = (CONL[1]*(SL-PRIL[1])+PM-PRIL[2])/(SL-SM);
       U[2] = (CONL[2]*(SL-PRIL[1])+PM*SM-PRIL[2]*PRIL[1])/(SL-SM);
-      //F[0] = U[0]*SM;
-      //F[1] = U[1]*SM + PM;
-      //F[2] = U[2]*SM + PM*SM;
-      FS = F(CONL, PRIL) + SL*(U - CONL);
+      FS[0] = U[0]*SM;
+      FS[1] = U[1]*SM + PM;
+      FS[2] = U[2]*SM + PM*SM;
+      //FS = F(CONL, PRIL) + SL*(U - CONL);
       return FS;
     }
     else {
@@ -46,10 +54,10 @@ bU Eulerian1D::HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PR
       U[0] = CONR[0]*(SR-PRIR[1])/(SR-SM);
       U[1] = (CONR[1]*(SR-PRIR[1])+PM-PRIR[2])/(SR-SM);
       U[2] = (CONR[2]*(SR-PRIR[1])+PM*SM-PRIR[2]*PRIR[1])/(SR-SM);
-      //F[0] = U[0]*SM;
-      //F[1] = U[1]*SM + PM;
-      //F[2] = U[2]*SM + PM*SM;
-      FS = F(CONR, PRIR) + SR*(U - CONR);
+      FS[0] = U[0]*SM;
+      FS[1] = U[1]*SM + PM;
+      FS[2] = U[2]*SM + PM*SM;
+      //FS = F(CONR, PRIR) + SR*(U - CONR);
       return FS;
     }
   }

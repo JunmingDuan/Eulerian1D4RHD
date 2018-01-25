@@ -15,16 +15,26 @@ void Eulerian1D::Solver() {
     //Euler_forward_LLF(dt, mesh);
     //Euler_forward_HLL(dt, mesh);
     //Euler_forward_HLLC(dt, mesh);
-    RK2_LF(Con, Pri, mesh, dt);
+    //RK2_LF(Con, Pri, mesh, dt);
     //RK2_HLLC(Con, Pri, mesh, dt);
     //SSP_RK_LF(Con, Pri, mesh, dt);
-    //SSP_RK_HLLC(Con, Pri, mesh, dt);
-    //std::cout << "NO. " << n << std::endl;
-    //std::cout << Pri << std::endl;
+    SSP_RK_HLLC(Con, Pri, mesh, dt);
     n++;
 
     t_now += dt;
     std::cout << "t: " << t_now << " , dt: " << dt << std::endl;
   }
+  //print error of rho
+  std::ofstream outfile("err.dat",std::ios::out);
+  if(!outfile) {
+    std::cout << "Open file failed!" << std::endl;
+  }
+  std::cout << "Print error to " << "err.dat" << " ..." << std::endl;
+  outfile.setf(std::ios::scientific);
+  outfile.precision(16);
+  //outfile << "error of rho" << "\n";
+  outfile << N_x << " " << cal_err(1) << " " << cal_err(2) << " " << cal_err(-1) << std::endl;
+  outfile.close();
+
 }
 

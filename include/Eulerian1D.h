@@ -12,6 +12,8 @@
 #include <assert.h>
 #include <cstdlib>
 #include <omp.h>
+#include "gsl/gsl_roots.h"
+#include "gsl/gsl_errno.h"
 #include "para.h"
 #include "vvector.h"
 #include "mvector.h"
@@ -30,6 +32,9 @@ struct Con_params
   double D, m, E, Gamma;
 };
 
+double func_p(double x, void *params);
+double func_dp(double x, void *params);
+void func_pdp(double x, void *params, double *y, double *dy);
 
 class Eulerian1D {
   private:
@@ -49,12 +54,15 @@ class Eulerian1D {
     Sol Pri;//数值解,primitive variables
     Sol ReconL_Con, ReconR_Con;//重构守恒变量,x_{i+\frac12}处左右极限值
     Sol ReconL_Pri, ReconR_Pri;//重构原始变量,x_{i+\frac12}处左右极限值
-    VEC Di;
     VEC mesh;
     VEC Gamma;
     VEC cs;
     Sol FLUX;
     GHOST ghostl, ghostr;
+
+    const gsl_root_fdfsolver_type *T;
+    gsl_root_fdfsolver *s;
+    gsl_function_fdf FDF;
 
   public:
     Eulerian1D(u_int Nx, double t_start, double t_end, double x_start, double x_end,
@@ -67,7 +75,6 @@ class Eulerian1D {
         ReconR_Con.resize(N_x+1);
         ReconL_Pri.resize(N_x+1);//边界加上了
         ReconR_Pri.resize(N_x+1);
-        Di.resize(N_x);
         mesh.assign(N_x+1, 0);
         Gamma.assign(N_x, 0);
         cs.assign(N_x, 0);
@@ -77,9 +84,18 @@ class Eulerian1D {
         for(u_int i = 0; i < N_x+1; ++i) {
           mesh[i] = h0*i;
         }
+        T = gsl_root_fdfsolver_newton;
+        s = gsl_root_fdfsolver_alloc (T);
+        FDF.f = &func_p;
+        FDF.df = &func_dp;
+        FDF.fdf = &func_pdp;
       }
 
   public:
+    //~Eulerian1D() {
+      //gsl_root_fdfsolver_free (s);
+    //}
+
     void Initial() {
       for(u_int j = 0; j != N_x; ++j) {
         Pri[j] = initial(t_start, 0.5*(mesh[j]+mesh[j+1]), Gamma[j]);
@@ -96,11 +112,8 @@ class Eulerian1D {
       ghostr.Gamma = Gamma[N_x-1];
     }
 
-    //double fp(const bU& U, double p, const double Gamma);
-    //double fpp(const bU& U, double p, const double Gamma);
-    double fp(double x, void *params);
-    double fpp(double x, void *params);
-    void fp_fdf(double x, void *params, double *y, double *dy);
+    double fp(const bU& U, double p, const double Gamma);
+    double fpp(const bU& U, double p, const double Gamma);
     /**
      * @brief Con2Pri solve (rho,u,p) from (D, m, E)
      *
@@ -147,19 +160,22 @@ class Eulerian1D {
     void Euler_forward_HLLC(const double dt, VEC& mesh);
 
     void RK2_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt);
+    void RK2_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt);
 
-    void SSP_RK_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt, double alpha);
+    void SSP_RK_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt);
     void SSP_RK_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt);
 
   public:
     void Solver();
-
     void update_sol(VEC& mesh, Sol& Con, Sol& Pri, Sol& FLUX, const double dt,
         VEC& mesh1, Sol& Con1, Sol& Pri1);
 
     void print_con(std::ostream& os);
     void print_pri(std::ostream& os);
     void print_rupe(std::ostream& os);
+
+    double cal_err(int l);
+
     friend std::ostream& operator<<(std::ostream&, const Eulerian1D&);
 
 };
