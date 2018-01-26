@@ -132,8 +132,12 @@ class Eulerian1D {
     double cal_max_lambda_Eul(const bU& Con, const bU& Pri, const double Gamma);
     double cal_max_lambda_Eul();
 
-    double t_step(const double CFL, double& alpha);
+  public:
+    void cal_roe_av(const bU& PRIL, const bU& PRIR, bU& ROE_AV);
+    void characteristic_decomposition(const bU& CONL, const bU& CONR, bU& CHARL, bU& CHARR);
+    void cal_roe_av_lambda(const bU& PRIL, const bU& PRIR, double& min_lam, double& max_lam);
 
+    double t_step(const double CFL, double& alpha);
     bU F(const bU& CON, const bU& PRI);
 
     bU LF(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PRIR, const double alpha);
