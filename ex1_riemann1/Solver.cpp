@@ -20,8 +20,6 @@ void Eulerian1D::Solver() {
     //RK2_HLLC(Con, Pri, mesh, dt);
     //SSP_RK_LF(Con, Pri, mesh, dt);
     //SSP_RK_HLLC(Con, Pri, mesh, dt);
-    //std::cout << "NO. " << n << std::endl;
-    //std::cout << Pri << std::endl;
     n++;
 
     t_now += dt;

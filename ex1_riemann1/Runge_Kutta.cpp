@@ -182,7 +182,6 @@ void Eulerian1D::RK2_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
 
 }
 
-
 void Eulerian1D::SSP_RK_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   VEC mesh_n(mesh), mesh1(N_x+1);
   Sol Con_n(Con), Pri_n(Pri);

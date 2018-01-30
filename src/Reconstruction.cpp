@@ -142,6 +142,16 @@ void Eulerian1D::Reconstruction(const Sol& sol, const VEC& mesh,
       h[i] = mesh[i+1] - mesh[i];
       CON_tmp[i] = Pri2Con(sol[i], Gamma[i]);
     }
+    //bU tmp1, tmp2, tmp3, tmp4;
+    //tmp1[0] = 10; tmp1[1] = 0.5; tmp1[2] = 100;
+    //tmp2[0] = 5; tmp2[1] = -0.5; tmp2[2] = 200;
+    //tmp3[0] = 30; tmp3[1] = 3; tmp3[2] = 100;
+    //ROE_AV_MAT(tmp1, tmp2, Gamma[0], Gamma[1], RMAT, LMAT);
+    //std::cout << tmp3 << std::endl;
+    //tmp4 = multiply(tmp3, LMAT);
+    //std::cout << multiply(tmp4, RMAT) << std::endl;
+    //abort();
+
 #pragma omp parallel for num_threads(Nthread)
     for(u_int i = 1; i < N_x; ++i) {//perform characteristic decomposition
       if(i == 1) {
