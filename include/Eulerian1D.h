@@ -164,6 +164,7 @@ class Eulerian1D {
     void Euler_forward_HLLC(const double dt, VEC& mesh);
 
     void RK2_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt);
+    void RK2_LLF(Sol& Con, Sol& Pri, VEC& mesh, const double dt);
     void RK2_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt);
 
     void SSP_RK_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt);

@@ -113,11 +113,44 @@ void Eulerian1D::RK2_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
 
 }
 
+void Eulerian1D::RK2_LLF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
+  Sol Con_n(Con), Pri_n(Pri);
+  //stage 1
+  if(is_RECON == 0 || is_RECON == 1) {
+    Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
+  }
+  else if(is_RECON == 2) {
+    Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
+  }
+  cal_flux_LLF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
+#pragma omp parallel for num_threads(Nthread)
+  for(u_int i = 0; i < N_x; ++i) {
+    Con[i] = Con_n[i] - dt*(FLUX[i+1] - FLUX[i]) / (mesh[i+1]-mesh[i]);
+    Pri[i] = Con2Pri(Con[i], Gamma[i]);
+  }
+  update_cs(cs);
+  //stage 2
+  if(is_RECON == 0 || is_RECON == 1) {
+    Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
+  }
+  else if(is_RECON == 2) {
+    Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
+  }
+  cal_flux_LLF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
+
+#pragma omp parallel for num_threads(Nthread)
+  for(u_int i = 0; i < N_x; ++i) {
+    Con[i] =  0.5*Con_n[i] + 0.5*Con[i] - 0.5*dt*(FLUX[i+1] - FLUX[i]) / (mesh[i+1]-mesh[i]);
+    Pri[i] = Con2Pri(Con[i], Gamma[i]);
+  }
+  update_cs(cs);
+
+}
+
+
 void Eulerian1D::RK2_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   Sol Con_n(Con), Pri_n(Pri);
-  double alpha;
   //stage 1
-  alpha = cal_max_lambda_Eul();
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
@@ -132,7 +165,6 @@ void Eulerian1D::RK2_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   }
   update_cs(cs);
   //stage 2
-  alpha = cal_max_lambda_Eul();
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }

@@ -35,7 +35,6 @@ bU Eulerian1D::HLLC(const bU& CONL, const bU& CONR, const bU& PRIL, const bU& PR
     double coe3 = SR*CONR[1] - SL*CONL[1] + CONL[1]*PRIL[1]+PRIL[2] - CONR[1]*PRIR[1]-PRIR[2];
     double PM;
     if(fabs(coe1) < 1e-15) SM = coe3/coe2;
-    else if(fabs(coe1*coe3) < 1e-15) SM = 0;
     else SM = (coe2 - sqrt(coe2*coe2 - 4.*coe1*coe3))/2./coe1;
     PM = (SM*(SL*CONL[2]-CONL[1]) + PRIL[2] - CONL[1]*(SL-PRIL[1])) / (1-SL*SM);
     if(SM >= 0) {
