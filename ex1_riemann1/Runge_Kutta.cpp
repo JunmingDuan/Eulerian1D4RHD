@@ -4,7 +4,7 @@ void Eulerian1D::Euler_forward_LF(double dt, double alpha, VEC& mesh) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX, alpha);
@@ -23,7 +23,7 @@ void Eulerian1D::Euler_forward_LLF(double dt, VEC& mesh) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LLF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -42,7 +42,7 @@ void Eulerian1D::Euler_forward_HLL(const double dt, VEC& mesh) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_HLL(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -61,7 +61,7 @@ void Eulerian1D::Euler_forward_HLLC(const double dt, VEC& mesh) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_HLLC(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -84,7 +84,7 @@ void Eulerian1D::RK2_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX, alpha);
@@ -99,7 +99,7 @@ void Eulerian1D::RK2_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX, alpha);
@@ -119,7 +119,7 @@ void Eulerian1D::RK2_LLF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LLF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -133,7 +133,7 @@ void Eulerian1D::RK2_LLF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LLF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -154,7 +154,7 @@ void Eulerian1D::RK2_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_HLLC(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -168,7 +168,7 @@ void Eulerian1D::RK2_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_HLLC(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -192,7 +192,7 @@ void Eulerian1D::SSP_RK_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX, alpha);
@@ -208,7 +208,7 @@ void Eulerian1D::SSP_RK_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX, alpha);
@@ -225,7 +225,7 @@ void Eulerian1D::SSP_RK_LF(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_LF(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX, alpha);
@@ -247,7 +247,7 @@ void Eulerian1D::SSP_RK_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_HLLC(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -260,7 +260,7 @@ void Eulerian1D::SSP_RK_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_HLLC(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);
@@ -274,7 +274,7 @@ void Eulerian1D::SSP_RK_HLLC(Sol& Con, Sol& Pri, VEC& mesh, const double dt) {
   if(is_RECON == 0 || is_RECON == 1) {
     Reconstruction(Con, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
-  else if(is_RECON == 2) {
+  else if(is_RECON == 2 || is_RECON == 3) {
     Reconstruction(Pri, mesh, ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri);
   }
   cal_flux_HLLC(ReconL_Con, ReconR_Con, ReconL_Pri, ReconR_Pri, FLUX);

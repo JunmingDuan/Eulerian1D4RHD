@@ -28,6 +28,9 @@ template <class T>
 void ENO2(double h1, double h2, double h3, const T& u1, const T& u2, const T& u3, const std::vector<double>& point,
     T& ul, T& ur);
 
+double ENO2_CELL_L(double h1, double h2, double h3, const double u1, const double u2, const double u3);
+double ENO2_CELL_R(double h1, double h2, double h3, const double u1, const double u2, const double u3);
+
 void ENO2(double h1, double h2, double h3, const double u1, const double u2, const double u3,
     double& ul, double& ur);
 

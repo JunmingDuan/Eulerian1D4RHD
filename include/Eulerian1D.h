@@ -19,6 +19,7 @@
 #include "mvector.h"
 
 typedef mvector<double,3> bU; //(D, m, E), cell average
+#define MAT mvector<mvector<double,3>,3>
 
 class GHOST {
   public:
@@ -134,7 +135,8 @@ class Eulerian1D {
 
   public:
     void cal_roe_av(const bU& PRIL, const bU& PRIR, const double, const double, bU& ROE_AV);
-    void characteristic_decomposition(const bU& CONL, const bU& CONR, bU& CHARL, bU& CHARR);
+    void ROE_AV_MAT(const bU& PRIL, const bU& PRIR, const double GAMMAL, const double GAMMAR, MAT& R, MAT& L);
+    bU multiply(const bU& x, MAT& M);
     void cal_roe_av_lambda(const bU& PRIL, const bU& PRIR, double& min_lam, double& max_lam);
 
     double t_step(const double CFL, double& alpha);

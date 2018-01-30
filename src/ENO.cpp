@@ -68,6 +68,26 @@ void ENO2(double h1, double h2, double h3, const T& u1, const T& u2, const T& u3
 
 }
 
+double ENO2_CELL_L(double h1, double h2, double h3, const double u1, const double u2, const double u3) {
+  double k1 = 2.*(u2 - u1)/(h1 + h2);
+  double k2 = 2.*(u3 - u2)/(h2 + h3);
+  double krho;
+  krho = fabs(k1) > fabs(k2) ? k2 : k1;
+
+  //return u2;
+  return -krho*(h2/2.) + u2;
+}
+
+double ENO2_CELL_R(double h1, double h2, double h3, const double u1, const double u2, const double u3) {
+  double k1 = 2.*(u2 - u1)/(h1 + h2);
+  double k2 = 2.*(u3 - u2)/(h2 + h3);
+  double krho;
+  krho = fabs(k1) > fabs(k2) ? k2 : k1;
+
+  //return u2;
+  return krho*(h2/2.) + u2;
+}
+
 void ENO2(double h1, double h2, double h3, const double u1, const double u2, const double u3,
     double& ul, double& ur) {
   //poly
@@ -75,9 +95,7 @@ void ENO2(double h1, double h2, double h3, const double u1, const double u2, con
   double k2 = 2.*(u3 - u2)/(h2 + h3);
   //minmod limiter
   double krho;
-  //if(k1*k2 < 0) krho = 0;
-  //else krho = fabs(k1)>fabs(k2) ? k2 : k1;
-  krho = fabs(k1)>fabs(k2) ? k2 : k1;
+  krho = fabs(k1) > fabs(k2) ? k2 : k1;
 
   ul = -krho*(h2/2.) + u2;
   ur = krho*(h2/2.) + u2;
