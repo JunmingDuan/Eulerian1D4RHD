@@ -405,6 +405,141 @@ void Eulerian1D::Reconstruction(const Sol& sol, const VEC& mesh,
       ReconR_Pri[N_x] = ReconR_Pri[0];
     }
   }
+  else if(is_RECON == 3) {//sol is primitive variables
+    VEC h(N_x);
+    Sol CON_tmp(N_x);
+    bU U1, U2, U3, U4;
+    double h1, h2, h3, h4;
+    MAT LMAT, RMAT;
+#pragma omp parallel for num_threads(Nthread)
+    for(u_int i = 0; i < N_x; ++i) {
+      h[i] = mesh[i+1] - mesh[i];
+      CON_tmp[i] = Pri2Con(sol[i], Gamma[i]);
+    }
+#pragma omp parallel for num_threads(Nthread)
+    for(u_int i = 1; i < N_x; ++i) {//perform characteristic decomposition
+      if(i == 1) {
+        ROE_AV_MAT(sol[i-1], sol[i], Gamma[i-1], Gamma[i], RMAT, LMAT);
+        h1 = h[0];
+        h2 = h[i-1];
+        h3 = h[i];
+        h4 = h[i+1];
+        if(BD == 1) {
+          U1 = multiply(CON_tmp[0], LMAT);
+        }
+        else if(BD == 2) {
+          U1 = multiply(CON_tmp[N_x-1], LMAT);
+        }
+        U2 = multiply(CON_tmp[i-1], LMAT);
+        U3 = multiply(CON_tmp[i], LMAT);
+        U4 = multiply(CON_tmp[i+1], LMAT);
+        for(u_int d = 0; d < 3; ++d) {
+          ReconR_Con[i][d] = WENO3_cell_L(h2, h3, h4, U2[d], U3[d], U4[d]);
+          ReconL_Con[i][d] = WENO3_cell_R(h1, h2, h3, U1[d], U2[d], U3[d]);
+        }
+        ReconL_Con[i] = multiply(ReconL_Con[i], RMAT);
+        ReconR_Con[i] = multiply(ReconR_Con[i], RMAT);
+        ReconL_Pri[i] = Con2Pri(ReconL_Con[i], Gamma[i-1]);
+        ReconR_Pri[i] = Con2Pri(ReconR_Con[i], Gamma[i]);
+      }
+      else if(i == N_x-1) {
+        ROE_AV_MAT(sol[i-1], sol[i], Gamma[i-1], Gamma[i], RMAT, LMAT);
+        h1 = h[i-2];
+        h2 = h[i-1];
+        h3 = h[i];
+        h4 = h[N_x-1];
+        U1 = multiply(CON_tmp[i-2], LMAT);
+        U2 = multiply(CON_tmp[i-1], LMAT);
+        U3 = multiply(CON_tmp[i], LMAT);
+        if(BD == 1) {
+          U4 = multiply(CON_tmp[N_x-1], LMAT);
+        }
+        else if(BD == 2) {
+          U4 = multiply(CON_tmp[0], LMAT);
+        }
+        for(u_int d = 0; d < 3; ++d) {
+          ReconR_Con[i][d] = WENO3_cell_L(h2, h3, h4, U2[d], U3[d], U4[d]);
+          ReconL_Con[i][d] = WENO3_cell_R(h1, h2, h3, U1[d], U2[d], U3[d]);
+        }
+        ReconL_Con[i] = multiply(ReconL_Con[i], RMAT);
+        ReconR_Con[i] = multiply(ReconR_Con[i], RMAT);
+        ReconL_Pri[i] = Con2Pri(ReconL_Con[i], Gamma[i-1]);
+        ReconR_Pri[i] = Con2Pri(ReconR_Con[i], Gamma[i]);
+      }
+      else {
+        ROE_AV_MAT(sol[i-1], sol[i], Gamma[i-1], Gamma[i], RMAT, LMAT);
+        h1 = h[i-2];
+        h2 = h[i-1];
+        h3 = h[i];
+        h4 = h[i+1];
+        U1 = multiply(CON_tmp[i-2], LMAT);
+        U2 = multiply(CON_tmp[i-1], LMAT);
+        U3 = multiply(CON_tmp[i], LMAT);
+        U4 = multiply(CON_tmp[i+1], LMAT);
+        for(u_int d = 0; d < 3; ++d) {
+          ReconR_Con[i][d] = WENO3_cell_L(h2, h3, h4, U2[d], U3[d], U4[d]);
+          ReconL_Con[i][d] = WENO3_cell_R(h1, h2, h3, U1[d], U2[d], U3[d]);
+        }
+        ReconL_Con[i] = multiply(ReconL_Con[i], RMAT);
+        ReconR_Con[i] = multiply(ReconR_Con[i], RMAT);
+        ReconL_Pri[i] = Con2Pri(ReconL_Con[i], Gamma[i-1]);
+        ReconR_Pri[i] = Con2Pri(ReconR_Con[i], Gamma[i]);
+      }
+   }
+    //deal with left BD
+    {
+      if(BD == 1) {
+        ROE_AV_MAT(sol[0], sol[0], Gamma[0], Gamma[0], RMAT, LMAT);
+      }
+      else if(BD == 2) {
+        ROE_AV_MAT(sol[N_x-1], sol[0], Gamma[N_x-1], Gamma[0], RMAT, LMAT);
+      }
+      h2 = h[0];
+      h3 = h[0];
+      h4 = h[1];
+      U2 = multiply(CON_tmp[0], LMAT);
+      U3 = multiply(CON_tmp[0], LMAT);
+      U4 = multiply(CON_tmp[1], LMAT);
+      for(u_int d = 0; d < 3; ++d) {
+        ReconR_Con[0][d] = WENO3_cell_L(h2, h3, h4, U2[d], U3[d], U4[d]);
+      }
+      ReconR_Con[0] = multiply(ReconR_Con[0], RMAT);
+      ReconR_Pri[0] = Con2Pri(ReconR_Con[0], Gamma[0]);
+    }
+    //deal with right BD
+    {
+      if(BD == 1) {
+        ROE_AV_MAT(sol[N_x-1], sol[N_x-1], Gamma[N_x-1], Gamma[N_x-1], RMAT, LMAT);
+      }
+      else if(BD == 2) {
+        ROE_AV_MAT(sol[N_x-1], sol[0], Gamma[N_x-1], Gamma[0], RMAT, LMAT);
+      }
+      h1 = h[N_x-2];
+      h2 = h[N_x-1];
+      h3 = h[N_x-1];
+      U1 = multiply(CON_tmp[N_x-2], LMAT);
+      U2 = multiply(CON_tmp[N_x-1], LMAT);
+      U3 = multiply(CON_tmp[N_x-1], LMAT);
+      for(u_int d = 0; d < 3; ++d) {
+        ReconL_Con[N_x][d] = WENO3_cell_R(h1, h2, h3, U1[d], U2[d], U3[d]);
+      }
+      ReconL_Con[N_x] = multiply(ReconL_Con[N_x], RMAT);
+      ReconL_Pri[N_x] = Con2Pri(ReconL_Con[N_x], Gamma[N_x-1]);
+    }
+    if(BD == 1) {//outflow
+      ReconL_Con[0] = ReconR_Con[0];
+      ReconR_Con[N_x] = ReconL_Con[N_x];
+      ReconL_Pri[0] = ReconR_Pri[0];
+      ReconR_Pri[N_x] = ReconL_Pri[N_x];
+    }
+    else if(BD == 2) {//period
+      ReconL_Con[0] = ReconL_Con[N_x];
+      ReconR_Con[N_x] = ReconR_Con[0];
+      ReconL_Pri[0] = ReconL_Pri[N_x];
+      ReconR_Pri[N_x] = ReconR_Pri[0];
+    }
+  }
+
 
 }
 #endif
