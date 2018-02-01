@@ -2,8 +2,8 @@
 #include "WENO_nonuniform.h"
 #include "ENO.h"
 
-#define SECOND_ORDER_ENO
-//#define THIRD_ORDER_WENO
+//#define SECOND_ORDER_ENO
+#define THIRD_ORDER_WENO
 #ifdef SECOND_ORDER_ENO
 void Eulerian1D::Reconstruction(const Sol& sol, const VEC& mesh,
     Sol& ReconL_Con, Sol& ReconR_Con, Sol& ReconL_Pri, Sol& ReconR_Pri) { //ENO2

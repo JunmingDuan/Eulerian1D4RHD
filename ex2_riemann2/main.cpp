@@ -1,6 +1,6 @@
 /**
  * @file main.cpp
- * @brief test cpp for 1D Lagranian scheme for RHD
+ * @brief test cpp for 1D Eulerian scheme for RHD
  * @author Duan Junming, duanjm@pku.edu.cn
  * @version 1.0
  * @date 2018-01-15
@@ -20,15 +20,15 @@ bU initial(const double t, const double x, double& Gamma) {
   bU v;
   if(x < 0.5) {
     v[0] = 1;
-    v[1] = 0.9;
-    v[2] = 1;
-    Gamma = 4./3;
+    v[1] = 0;
+    v[2] = 1e3;
+    Gamma = 5./3;
   }
   else {
     v[0] = 1;
     v[1] = 0;
-    v[2] = 10;
-    Gamma = 4./3;
+    v[2] = 1e-2;
+    Gamma = 5./3;
   }
 
   return v;

@@ -34,12 +34,6 @@ void Eulerian1D::ROE_AV_MAT(const bU& PRIL, const bU& PRIR, const double GAMMAL,
       L[2][0] = (GAMMAL-1)*e;    L[2][1] = - s2*v1-s*y*v0 + (GAMMAL-1)*e*cp*v1; L[2][2] = s2*v0 + s*y*v1 - (GAMMAL-1)*e*cp*v0;
       L *= -0.5/e/s2;
     }
-    //R[0][0] = 1; R[0][1] = 0; R[0][2] = 0;
-    //R[1][0] = 0; R[1][1] = 1; R[1][2] = 0;
-    //R[2][0] = 0; R[2][1] = 0; R[2][2] = 1;
-    //L[0][0] = 1; L[0][1] = 0; L[0][2] = 0;
-    //L[1][0] = 0; L[1][1] = 1; L[1][2] = 0;
-    //L[2][0] = 0; L[2][1] = 0; L[2][2] = 1;
 }
 
 bU Eulerian1D::multiply(const bU& x, MAT& M) {
