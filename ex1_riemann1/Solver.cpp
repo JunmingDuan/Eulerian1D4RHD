@@ -13,9 +13,9 @@ void Eulerian1D::Solver() {
 
     //Euler_forward_LF(dt, alpha, mesh);
     //Euler_forward_LLF(dt, mesh);
-    //Euler_forward_HLL(dt, mesh);
+    Euler_forward_HLL(dt, mesh);
     //Euler_forward_HLLC(dt, mesh);
-    RK2_LF(Con, Pri, mesh, dt);
+    //RK2_LF(Con, Pri, mesh, dt);
     //RK2_LLF(Con, Pri, mesh, dt);
     //RK2_HLLC(Con, Pri, mesh, dt);
     //SSP_RK_LF(Con, Pri, mesh, dt);
